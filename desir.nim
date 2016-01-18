@@ -4,13 +4,13 @@ import macros
 type RedisError = object of Exception
 
 type
-  RESPKind = enum  # the different RESP (REdis Serialization Protocol) types
+  RESPKind* = enum  # the different RESP (REdis Serialization Protocol) types
     sString,       # simple strings
     cInteger,      # Integer
     bString,       # bulk string
     sArray,        # Array
     # Error is excluded as it is raising an error directly
-  RESPObj = object
+  RESPObj* = object
     case kind: RESPKind  
     of cInteger: intVal: int
     of sString: strVal: string
@@ -18,7 +18,7 @@ type
     of sArray: rArray: seq[RESPObj]
 
 
-proc `$`(resp: RESPObj): string = 
+proc `$`*(resp: RESPObj): string = 
   case resp.kind
   of sString:
     if isNil(resp.strVal):
