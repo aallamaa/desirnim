@@ -21,7 +21,7 @@ type
 proc `$`*(resp: RESPObj): string = 
   case resp.kind
   of sString:
-    if isNil(resp.strVal):
+    if resp.strVal.len == 0:
       result = "nil"
     else:
       result = resp.strVal
@@ -47,7 +47,7 @@ type
     transaction: bool
     subscribed: bool
 
-proc open*(host = "localhost", port = 6379.Port, db = 0, password:string = nil, timeout:int = 0, safe = false): Redis =
+proc open*(host = "localhost", port = 6379.Port, db = 0, password:string = "", timeout:int = 0, safe = false): Redis =
   ## Opens a connection to the redis server.
   result.db = db
   result.host = host
@@ -76,7 +76,7 @@ proc parse_resp*(r: Redis): RESPObj =
   #echo(resp)
   case resp
   of "$-1":
-    result = RESPObj(kind: sString, strVal: nil)
+    result = RESPObj(kind: sString, strVal: "")
   of "*-1":
     result = RESPObj(kind: sArray, rArray: @[] ) 
   else:
@@ -114,7 +114,7 @@ proc parse_resp*(r: Redis): RESPObj =
 #  sendcmd(r,"HSCAN",a)
 #  result = parse_resp(r)
       
-macro readCommandsFile(commandsFile: string): stmt =
+macro readCommandsFile(commandsFile: string): untyped =
   let cmdFile = slurp(commandsFile.strVal)
   var source = ""
   for line in cmdFile.splitLines:
